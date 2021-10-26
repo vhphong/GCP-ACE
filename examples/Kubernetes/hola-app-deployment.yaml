@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: hola-world-deployment #Arbitrary
+spec:
+    replicas: 4 # How many versions of the pod we want
+    selector: # select which pods to replicate
+        matchLabels:
+            app: hola-er
+    template: # This starts the information about the what is in the pod and its labels
+        metadata:
+            labels:
+                app: hola-er # Give pods these labels
+        spec:
+            containers:
+                - name: hola-app # Arbitrary
+                  image: adaman94/hola-app
+                  ports:
+                      - containerPort: 3000

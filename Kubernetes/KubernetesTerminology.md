@@ -5,14 +5,47 @@
 # Node
 - A VM (Physical computer if on premise) that is in a cluster
 - A node runs an agent/software called **kubelet** which connects it the master node
-
+# Kubelet
+- This is a specific program on a node that connects it to the control plane.
+- Takes up some resources like RAM and CPU to run.
+- Gives the control plane a way to use that computer
+# Node Pools
+- Groups of vms within a cluster
+- These vms might have certain program of hardware specs that you might want to run a specific workload on.
+- There is a default node pool
+    - so you always have at least one
+# Control Plane
+- The brain of kubernetes
+- Controls all the nodes in the cluster
+    - Add workloads to vms
+# Master Node
+- The VM that runs the control plane progam is called the master node
+- In GKE the master node is abstracted away and you do not access that vm directly
 # Controller
+- The primary way the kubernetes control plane maintains and creates the desired state.
+- There is a controller responsible for every type of object
 - Manages a pod(s)
 - **ReplicaSet** is responsible for how many instances of a pod there are
 - Eviction
     - Kubernetes shutting down a pod
 - Preemption
     - Kubenetes evicts a Pod because resouces are needed for a higher priority pod
+
+![Kubernetes infrastructure](k8sinfrastructure.png)
+
+# Yaml Key Terms
+    - **Kind**
+        - the type of object you are creating
+    - **metadata**
+        - High level information about the object
+        - Used by controllers to identify and connect objects for the desired state
+        - **name**
+            - the custom name of the object you are creating
+        - **Annotations**
+            - Modify the Kubernetes object
+            - Used to add additional functionality to the object
+    - **spec**
+        - technial specifictions of the object you are creating
 
 # Pod
 - Smallest atomic unit of computing in a cluster
@@ -37,6 +70,21 @@
     - You can don't worry about port conlficts etc...
 - A pod runs on a node
 
+```yaml
+apiVersion: v1 # version of kubernetes you are writing
+kind: Pod # type of kubernetes object you are creating
+metadata: # information about the pod for kubernetes
+  name: hello-pod-1
+  labels: # the labels are just for marking up and selecting pods
+    app: greeting
+    language: english
+spec: # technical specifications of the pod
+  containers:
+    - name: hello-world-app # arbitrary name
+      image: adaman94/hello-app
+      ports:
+      - containerPort: 3000 # port number the app in the container listens on
+```
 
 # Service
 - Exposes pods to the outside intenet or to other pods
@@ -49,6 +97,23 @@
     - LoadBalancer
         - Offered by some cloud providers
         - Creates an external IP that can be used to expose a pod(s)
+
+```yaml
+apiVersion: v1
+kind: Service # we are creating a service object
+metadata:
+  name: hello-service # the name of the service in kubernetes. does not have any real impact on code
+spec: # technial specifications of the service
+  type: LoadBalancer # Type of service are the other types NodePort, ClusterIP
+  selector: # Selectors specify what pods does this service expose
+    app: greeting # This selects the pod we created
+  ports: 
+    - protocol: TCP
+      port: 80 # port of the load balancer 80 is the standard http port 
+      targetPort: 3000 # what port on the pod does this service listen to
+```
+
+![Pod Anatomy](podsandservices.png)
 
 # Volume
 - Decouple storage and persistence from the pod
@@ -75,6 +140,18 @@
     - A claim is seprate resource
     - It is like a voucher granting the ability to use a Persistent Volume
 
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim # persists through pod changes
+metadata:
+  name: small-persistent-disk
+spec:
+  accesModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+```
 
 # Workload
 - Manages a group of pods
@@ -99,6 +176,34 @@
         - For pods that that runs **until complete**
         - Example a pod that reads a database to create a report it sends to a bucket
 
+```yaml
+apiVersion: apps/v1
+kind: Deployment # what type of kubernetes resource/object we are creating
+metadata: # information about the kubernetes resource, it's name in kubernetes for instance
+  name: hello-world-deployment
+spec: # Technial blueprint for the object we are creating
+  replicas: 3 # deployement specs. How much are we making
+  selector:
+    matchLabels: 
+      app: greeting 
+  template: # template for a pod
+    metadata:
+      labels:
+        app: greeting
+    spec: # spec of the pod
+      containers:
+        - name: hello-container
+          image: adaman94/hello-app
+          ports:
+            - containerPort: 3000  
+```
+# Desired Sate
+- you create objects for the cluster to run and maintain
+- control plane's *primary responsibility* is to create and maintain the specified desired state
+    - it will do whatever it takes
+
+![Desired State](desiredstate.png)
+
 # Ingress
 - Serves as the entrypoint to a cluster
 - Having an external LoadBalancer service for each group of pods needless exposes every service
@@ -107,6 +212,65 @@
 - Ingresses by themselves do not do anything
     - They require an **Ingress Controller** to work
     - Nginx is an example
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+  annotations: # Any object can use annotations. These will affect the resource/object in certain ways
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: $1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /english(.+) # regular expression of nginx
+            pathType: Prefix
+            backend:
+              service:
+                name: hello-service
+                port:
+                  number: 80
+          - path: /spanish(.+)
+            pathType: Prefix
+            backend:
+              service:
+                name: hola-service
+                port:
+                  number: 80
+```
+
+### Helm
+- Helm a package managment tool for Kubernetes
+    - GKE Helm comes already installed
+- This is how we downloaded the nginx ingress
+- *npm is to node as helm is to kubernetes*
+- Helm does not use the term package, it uses the term **Chart**
+- Downloading a chart is like installing a dependency in node.js
+
+# Workload Identity
+    - Create Kubernetes Service account and link it to a GCP service account
+    - Gives a specific pod the identity of that service account.
+    - Not strictly for K8s.
+        - Can be used for machines/software not on the GCP cloud
+        - VMs on AWS that you wanted GCP to recognize as having a specific service account.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  anotations: # add extra functionality to objects in kubernetes
+    iam.gke.io/gcp-service-account: datastore@community-library-baeder.iam.gserviceaccount.com # GCP service account email
+  name: data-user
+  namespace: default
+
+# need to run this in order to connect correctly
+# workloadidentitynamespace is in clusters, details, workload identity namespace
+# template
+# gcloud iam service-accounts add-iam-policy-binding --role roles/iam.workloadIdentityUser --member "serviceAccount:workloadidentitynamespace[default/ksa]" emailaddressofservicacount
+```
 
 # Quick cheat sheet
 

@@ -15,7 +15,13 @@
     - PROJECT_NUMBER-compute@developer.gserviceaccount.com for getting the service account email 
 
 # Infrastructure breakdown
-A journery of an http request to a application running on a GCP server
+
+![Google Cloud Network](https://storage.googleapis.com/gweb-cloudblog-publish/images/gcp_regions_and_zones.max-2800x2800.jpg)
+
+A journery of an http request to an application running on a GCP server
+
+![User Journey](https://cloud.google.com/load-balancing/images/ilb-l7-tiers.svg)
+
 - Point of Prescence (Where the public internet connects to Google's Network)
     - Private Global Network
         - Multi-region *US* 
@@ -23,5 +29,7 @@ A journery of an http request to a application running on a GCP server
                 - Zone *us-central1a*
                     - Datacenter (building)
                         - Rack
-                            - Server
-Communication between GCP resources never has to leave the private global network.                           
+                            - Server Communication between GCP resources never has to leave the private global network.                           
+
+
+![Google Backbone Networks](https://storage.googleapis.com/gweb-cloudblog-publish/images/cloud_network_diagram.max-2800x2800.jpg)

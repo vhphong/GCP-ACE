@@ -28,5 +28,5 @@
 
 
 ```bash
-    gcloud functions deploy myfunction --runtime python27 --trigger-resource mybucket --trigger-event google.storage.object.ginalize
+    gcloud functions deploy myfunction --runtime python27 --trigger-resource mybucket --trigger-event google.storage.object.finalize
 ```

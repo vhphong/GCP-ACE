@@ -1,0 +1,12 @@
+runtime: nodejs14
+service: reva-point-tracker
+instance_class: F1
+automatic_scaling:
+  min_instances: 1
+  max_instances: 2
+
+service_account: datastore-computer@reva-points-tracker-ranieri.iam.gserviceaccount.com
+
+## Can also include environment variables within the yaml as follows
+env_variables:
+  MESSAGE: Hola Todas

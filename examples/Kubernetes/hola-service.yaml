@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: Service # what type of resource we are creating
 metadata:
-    name: hello-service # Arbitrary name
+    name: hola-service # Arbitrary name
 spec:
-    type: LoadBalancer # What type of service (default is ClusterIP)
+    type: ClusterIP # IF you don't specify a type, it would default to ClusterIP
     selector:
-        app: greeting # grab pods with this key value label
+        app: hola-er # grab pods with this key value label
     ports:
         - protocol: TCP
           port: 80 # port the load balancer

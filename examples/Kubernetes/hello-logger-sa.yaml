@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+    annotations:
+        iam.gke.io/gcp-service-account: logging-writer@projectnamehere.iam.gserviceaccount.com # Call the appropriate service account for your project/organizaiton
+    name: logging-writer
+    namespace: default

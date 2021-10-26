@@ -9,12 +9,14 @@
         - VM that runs a service
         - Resident: always up and running
         - Dynamic: Can be deleted or created via autoscaling
+![App Engine Components](https://cloud.google.com/appengine/docs/images/modules_hierarchy.svg)
+
 - An App Engine is a single application (only 1 per project)
     - 1 Application has many services
     - Each service can have many versions
         - A version is a unique combination of source code and an app.yaml
     - Each version runs on one or more instances
-- You can host an application using  App Engine
+- You can host an application using App Engine
     - It will automate deployment
     - It will use HTTP
     - It can do autoscaling
@@ -29,7 +31,7 @@
             - Node
             - Python
             - PHP
-            - Ruby 
+            - Ruby
             - Go
         - Great elasticity
     - App Engine Flexible
@@ -58,7 +60,7 @@ env: flex # for containers
 service: accounting
 ```
 - Deployment notes
-    - Your application ***MUST*** listen for a environment variable called PORT
+    - Your application ***MUST*** listen for an environment variable called PORT
     - For some apps host name must be 0.0.0.0
     - In *node* App Engine calls npm run start to begin the application
 
@@ -81,7 +83,7 @@ service: accounting
     gcloud app versions stop authservicev1 shoppingservicev3
 ```
 
-### routing traffic
+### Routing traffic
 
 ```bash
     gcloud app services set-traffic authservice --splits authv3=.35 authv4=.66

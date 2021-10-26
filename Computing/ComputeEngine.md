@@ -7,7 +7,7 @@
     - Can create snapshots of the disk
         - Snapshots work like version control and track changes to data to minimize size
         - Snapshot v1:100gb, Snapshot v2:105gb = 105 total gbs stored
-            - 100 gbs from the originial 5 gbs from the changes
+            - 100 gbs from the original 5 gbs from the changes
     - Can be configured automatically
 - New Instance Creation Sequence
     0. A service account will be created or must already exist
@@ -38,23 +38,32 @@
     - Another Image
 
 # Instance Group
+- A group of instances that you have logically lumped together
 - A group of instances managed as a single entity
 - Any command issued to an instance group is issued to all vms in the group
 - Managed Instance group
     - All vms are of the same type and configuration
     - Must be created from a instance-template
+    - You can configure GCP to manage them
+        - Uniformally update
+        - Uniformally add and remove vms
+![Managed Instance Group](https://cloud.google.com/compute/images/mig-overview.svg)
 - Unmanaged Instance group
-    - VMs of different types and configurations are added to to the instance group
-    - Usually for retroactivly creating a instance group of existing servers
+    - They are unmanaged in that the developer has to do any maitnence manually
+        - adding new computers
+        - removing new VMs
+        - Running updates on the VMs
+    - Usually for retroactivly creating an instance group of existing servers
 
-### Administartion and Managing
+
+### Administration and Managing
 - Use labels and descriptions
 - Common or repeated tasks should be done via gcloud and scripts
     - Scripts and version control should be used to keep a record of configurations and why
-- Console should be used for ad hoc administartion
+- Console should be used for ad hoc administration
 - Use instance groups for auto-scaling
 - Use preemptible VMs if possible
-- Use snapshots to create backups and promote resusability
+- Use snapshots to create backups and promote reusability
 
 
 # Marketplace (Cloud Launcher)
@@ -70,13 +79,13 @@ resources:
 ```
 
 # TidBits
-- Startup scripts execute everytime you restart an instance
+- Startup scripts execute every time you restart an instance
     - Meta-data startup script
 - Service Accounts
 
 # Create an instance
 ```bash
-    gcloud compute instances create --machine-type=n1-standard-8 awsesomeserver
+    gcloud compute instances create --machine-type=n1-standard-8 awesomeserver
 ```
 ### Common flags for creating instance
 - --boot-disk-size
@@ -92,12 +101,12 @@ resources:
 
 # Stop
 ```bash
-    gcloud compute instances stop awsesomeserver
+    gcloud compute instances stop awesomeserver
 ```
 
 # Delete
 ```bash
-    gcloud compute instances delete awsesomeserver
+    gcloud compute instances delete awesomeserver
 ```
 
 
@@ -112,7 +121,7 @@ curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadat
 
 # create instance template
 ```bash
-glcoud compute instance-templates create hello-template --source-instance=hello-server --source-instance-zone=us-central1-a
+gcloud compute instance-templates create hello-template --source-instance=hello-server --source-instance-zone=us-central1-a
 ```
 
 # Disks
@@ -146,6 +155,6 @@ glcoud compute instance-templates create hello-template --source-instance=hello-
     gcloud compute firewall-rules create
     gcloud compute firewall-rules create express-app –-network devnet –-allow tcp:3000
     gcloud compute shared-vpc 
-    # you can applay a single vpc to multiple projects or folders
+    # you can apply a single vpc to multiple projects or folders
     
 ```

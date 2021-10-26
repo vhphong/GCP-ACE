@@ -1,19 +1,34 @@
 apiVersion: apps/v1
-kind: Deployment 
+kind: Deployment
 metadata:
-  name: hello-world-deployment #Arbitrary
+    name: hello-world-deployment #Arbitrary
 spec:
-  replicas: 3 # How many versions of the pod we want
-  selector: # select which pods to replicate
-    matchLabels:
-      app: greeting
-  template: # This starts the information about the what is in the pod and its labels
-    metadata:
-      labels:
-        app: greeting # Give pods these labels
-    spec:
-      containers:
-      - name: hello-app # Arbitrary
-        image: adaman94/hello-app
-        ports:
-        - containerPort: 300
+    replicas: 3 # How many versions of the pod we want
+    selector: # select which pods to replicate
+        matchLabels:
+            app: greeting
+    template: # This starts the information about the what is in the pod and its labels
+        metadata:
+            labels:
+                app: greeting # Give pods these labels
+        spec:
+            serviceAccount: logging-writer # This references the Kubernetes Service Account (KSA) object defined by our hello-logger-sa.yaml and utilizes our logging Service Account from iam to writer to logs
+            containers:
+                - name: hello-app # Arbitrary
+                  image: adaman94/hello-app
+                  ports:
+                      - containerPort: 3000
+                  env: # This lets you define environment variables, either hard coded or from kubernetes objects.
+                      - name: PASSWORD
+                        valueFrom: # just use value: if you want to hard code it
+                            secretKeyRef:
+                                name: hello-secret
+                                key: password
+
+                  volumeMounts: # Include this and everything beneath if you wish to include a PVC
+                      - mountPath: /workspace/logs # this references the containers directory for our log folder, which should be attached to a PVC
+                        name: log-volume # Arbitrary name, used to identify the PVC
+            volumes:
+                - name: log-volume
+                  persistentVolumeClaim:
+                      claimName: small-persistant-disk # This is used to reference our Object in Kubernetes, defined in the hello-pvc.yaml
